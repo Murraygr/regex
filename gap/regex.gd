@@ -17,3 +17,7 @@
 #! @Description
 #!   Insert documentation for your function here
 DeclareGlobalFunction( "regex_Example" );
+DeclareGlobalFunction( "reg_Char_Match" );
+DeclareGlobalFunction( "reg_Individual_Match");
+DeclareGlobalFunction( "reg_Match");
+DeclareGlobalFunction( "RegularExpression" );
