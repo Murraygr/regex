@@ -5,7 +5,6 @@
 #
 InstallGlobalFunction( regex_Example,
 function()
-	Print( "This is a placeholder function, replace it with your own code.\n" );
 end );
 
 InstallGlobalFunction( reg_Alternative_Match,
@@ -102,12 +101,12 @@ function(exp, target)
 	
 	split_exp:= reg_Split(exp);
 
+	if reg_Is_Special(split_exp[2]) then
+		return reg_Special_Match(split_exp, target, 0, true);
+	fi;
+
 	if (split_exp[1][1] = '(') and (split_exp[1][Length(split_exp[1])] = ')') then
 		return reg_Alternative_Match(split_exp, target);
-	
-	elif reg_Is_Special(split_exp[2]) then
-		return reg_Special_Match(split_exp, target, 0, true);
-	
 	fi;
 
 	if reg_Char_Match(exp, target) then
