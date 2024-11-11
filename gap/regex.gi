@@ -37,11 +37,8 @@ function(split_exp, target, min_match_num, infinite)
 	od;
 
 	while match_len >= min_match_num do 
-		#Print(temp);
 		temp2:= Concatenation(temp, split_exp[3]);
-		#Print(temp2);
 		matched:= reg_Individual_Match(temp2, target);
-		#Print(matched);
 		if matched then
 			return matched;
 		fi;
@@ -69,7 +66,7 @@ function(exp)
 		temp:= reg_Match(")", exp);
 		end_of_start:= temp[2];
 		start:= String(exp{ [1..end_of_start] });
-		end_of_start:= end_of_start+1; 
+		end_of_start:= end_of_start+1;
 	else
 		end_of_start:= 2;
 		start:= [exp[1]];
@@ -88,6 +85,7 @@ end	);
 
 InstallGlobalFunction( reg_Char_Match,
 function(exp, target)
+	#Print(target,"\n");
 	return exp[1] = target[1];
 end );
 
@@ -97,15 +95,21 @@ function(exp, target)
 
 	if (Length(exp)=1 and reg_Char_Match(exp,target)) or (exp = "") then
 		return true;
+	elif (Length(exp)=2) then
+		if (exp[2]='$') then
+			if (Length(target) = 1) then
+				return true;
+			else return false;
+			fi;
+		fi;
 	fi;
 	
 	split_exp:= reg_Split(exp);
 
 	if reg_Is_Special(split_exp[2]) then
 		return reg_Special_Match(split_exp, target, 0, true);
-	fi;
 
-	if (split_exp[1][1] = '(') and (split_exp[1][Length(split_exp[1])] = ')') then
+	elif (split_exp[1][1] = '(') and (split_exp[1][Length(split_exp[1])] = ')') then
 		return reg_Alternative_Match(split_exp, target);
 	fi;
 
@@ -123,7 +127,13 @@ function(exp, target)
 
 	position:= 1;
 	found:= false;
-	max_pos:= Length(target);
+
+	if (exp[1]='^') then
+		max_pos:= 1;
+		exp:= exp{ [2..Length(exp)] };
+	else
+		max_pos:= Length(target);
+	fi;
 
 	while (position <= max_pos) do
 		if found <> reg_Individual_Match(exp, target{ [position..Length(target)] }) then
