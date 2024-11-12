@@ -72,7 +72,7 @@ function(exp)
 		start:= [exp[1]];
 	fi;
 
-	if end_of_start < Length(exp) and reg_Is_Special(exp[end_of_start]) then
+	if end_of_start <= Length(exp) and reg_Is_Special(exp[end_of_start]) then
 		special:= exp[end_of_start];
 		end_of_start:= end_of_start+1;
 	fi;
@@ -85,7 +85,6 @@ end	);
 
 InstallGlobalFunction( reg_Char_Match,
 function(exp, target)
-	#Print(target,"\n");
 	return exp[1] = target[1];
 end );
 
@@ -93,8 +92,10 @@ InstallGlobalFunction( reg_Individual_Match,
 function(exp, target)
 	local split_exp;
 
-	if (Length(exp)=1 and reg_Char_Match(exp,target)) or (exp = "") then
+	if (exp = "") then
 		return true;
+	elif (target = "") then
+		return false;
 	elif (Length(exp)=2) then
 		if (exp[2]='$') then
 			if (Length(target) = 1) then
