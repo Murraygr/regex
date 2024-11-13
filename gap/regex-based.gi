@@ -7,6 +7,27 @@ InstallGlobalFunction( regex_Example,
 function()
 end );
 
+InstallGlobalFunction( reg_Is_Star,
+function(char)
+	if char = '*' then return true;
+	else return false;
+	fi;
+end );
+
+InstallGlobalFunction( reg_Is_Question,
+function(char)
+	if char = '?' then return true;
+	else return false;
+	fi;
+end );
+
+InstallGlobalFunction( reg_Is_Plus,
+function(char)
+	if char = '+' then return true;
+	else return false;
+	fi;
+end );
+
 InstallGlobalFunction( reg_Alternative_Match,
 function(exp, target)
 	local options, found, i;
@@ -23,11 +44,17 @@ function(exp, target)
 end );
 
 InstallGlobalFunction( reg_Special_Match,
-function(split_exp, target, min_match_num, infinite)
+function(split_exp, target, min_match_num, max_match_num, infinite)
 	local match_len, found, temp, matched, temp2;
 	match_len:= 0;
 	temp:= "";
-	while infinite do
+
+	if min_match_num <> 0 then
+		temp:= Concatenation(temp, String(split_exp[1]));
+		match_len:= 1;
+	fi;
+
+	while infinite or (match_len < max_match_num) do
 		found:= reg_Individual_Match(temp, target);
 		if found then
 			temp:= Concatenation(temp, String(split_exp[1]));
@@ -50,7 +77,7 @@ end	);
 
 InstallGlobalFunction( reg_Is_Special,
 function(char)
-	if char = '*' then
+	if reg_Is_Star(char) or reg_Is_Question(char) or reg_Is_Plus(char) then
 		return true;
 	else return false;
 	fi;
@@ -107,8 +134,14 @@ function(exp, target)
 	
 	split_exp:= reg_Split(exp);
 
-	if reg_Is_Special(split_exp[2]) then
-		return reg_Special_Match(split_exp, target, 0, true);
+	if reg_Is_Star(split_exp[2]) then
+		return reg_Special_Match(split_exp, target, 0, 0, true);
+	
+	elif reg_Is_Question(split_exp[2]) then
+		return reg_Special_Match(split_exp, target, 0, 1, false);
+	
+	elif reg_Is_Plus(split_exp[2]) then
+		return reg_Special_Match(split_exp, target, 1, 0, true);
 
 	elif (split_exp[1][1] = '(') and (split_exp[1][Length(split_exp[1])] = ')') then
 		return reg_Alternative_Match(split_exp, target);
