@@ -17,6 +17,9 @@
 #! @Description
 #!   Insert documentation for your function here
 DeclareGlobalFunction( "regex_Example" );
+DeclareGlobalFunction( "reg_Is_Question" );
+DeclareGlobalFunction( "reg_Is_Star" );
+DeclareGlobalFunction( "reg_Is_Plus" );
 DeclareGlobalFunction( "reg_Alternative_Match" );
 DeclareGlobalFunction( "reg_Special_Match" );
 DeclareGlobalFunction( "reg_Is_Special" );
