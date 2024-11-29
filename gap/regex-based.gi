@@ -94,6 +94,10 @@ function(exp)
 		end_of_start:= temp[2];
 		start:= String(exp{ [1..end_of_start] });
 		end_of_start:= end_of_start+1;
+	elif exp[1] = '\\' then
+		end_of_start:= 2;
+		start:= String(exp{ [2..end_of_start] });
+		end_of_start:= 3;
 	else
 		end_of_start:= 2;
 		start:= [exp[1]];
@@ -112,6 +116,9 @@ end	);
 
 InstallGlobalFunction( reg_Char_Match,
 function(exp, target)
+	if exp = "." then
+		return true;
+	fi;
 	return exp[1] = target[1];
 end );
 
@@ -119,7 +126,7 @@ InstallGlobalFunction( reg_Individual_Match,
 function(exp, target)
 	local split_exp;
 
-	if (exp = "") then
+	if (exp = "") or (exp = ".") then
 		return true;
 	elif (target = "") then
 		return false;
@@ -127,7 +134,8 @@ function(exp, target)
 		if (exp[2]='$') then
 			if (Length(target) = 1) then
 				return true;
-			else return false;
+			else 
+				return false;
 			fi;
 		fi;
 	fi;
@@ -147,8 +155,8 @@ function(exp, target)
 		return reg_Alternative_Match(split_exp, target);
 	fi;
 
-	if reg_Char_Match(exp, target) then
-		return reg_Individual_Match(exp{ [2..Length(exp)] }, target{ [2..Length(target)] });
+	if reg_Char_Match(split_exp[1], target) then
+		return reg_Individual_Match(split_exp[3], target{ [2..Length(target)] });
 
 	else return false;
 	fi;
