@@ -122,6 +122,7 @@ function(exp, target)
 	return exp[1] = target[1];
 end );
 
+#Fix bug where "\\." matches any character
 InstallGlobalFunction( reg_Individual_Match,
 function(exp, target)
 	local split_exp;
