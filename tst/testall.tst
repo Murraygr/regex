@@ -19,4 +19,6 @@ gap> reg_Match("meo*w", "meow");
 [ true, 1 ]
 gap> reg_Match("meo*w", "meoooooow");
 [ true, 1 ]
+reg_Match("a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?aaaaaaaaaaaaaaaaaaaaaaa", "aaaaaaaaaaaaaaaaaaaaaaa");
+[ true, 1 ]
 gap> STOP_TEST( "testall.tst", 10000 );
