@@ -1,2 +1,8 @@
 DeclareGlobalFunction( "reg_Example" );
-DeclareGlobalFunction( "reg_Convert_to_Automata" );
+DeclareGlobalFunction( "thompsons_nfa" );
+DeclareGlobalFunction( "literal_nfa" );
+DeclareGlobalFunction( "concatenate_nfa" );
+DeclareGlobalFunction( "question_nfa" );
+DeclareGlobalFunction( "star_nfa" );
+DeclareGlobalFunction( "union_nfa" );
+DeclareGlobalFunction( "create_state" );
