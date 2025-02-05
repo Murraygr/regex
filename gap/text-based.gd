@@ -11,4 +11,5 @@ DeclareGlobalFunction( "epsilon_transitions" );
 DeclareGlobalFunction( "move_state" );
 DeclareGlobalFunction( "convert_to_postfix" );
 DeclareGlobalFunction( "is_operator" );
+DeclareGlobalFunction( "display_Automaton");
 DeclareGlobalFunction( "text_Match" );

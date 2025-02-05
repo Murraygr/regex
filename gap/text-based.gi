@@ -60,7 +60,7 @@ function(stack)
     start2:= nfa2.start;
     end2:= nfa2.end_state;
     
-    Add(nfa1.transition, [end1, start2, "@"]);
+    Add(nfa1.transition, [end1, start2, '@']);
     for transition in nfa2.transition do
         Add(nfa1.transition, transition);
     od;
@@ -78,9 +78,9 @@ function(stack, stateCounter)
     end_state:= stateCounter+1;
     stateCounter:= stateCounter+1;
     
-    Add(nfa.transition, [start, nfa.start, "@"]);
-    Add(nfa.transition, [start, end_state, "@"]);
-    Add(nfa.transition, [nfa.end_state, end_state, "@"]);
+    Add(nfa.transition, [start, nfa.start, '@']);
+    Add(nfa.transition, [start, end_state, '@']);
+    Add(nfa.transition, [nfa.end_state, end_state, '@']);
     
     Add(stack, rec(start:= start, end_state:= end_state, transition:= nfa.transition));
 end );
@@ -96,10 +96,10 @@ function(stack, stateCounter)
     end_state:= stateCounter+1;
     stateCounter:= stateCounter+1;
     
-    Add(nfa.transition, [start, nfa.start, "@"]);
-    Add(nfa.transition, [start, end_state, "@"]);
-    Add(nfa.transition, [nfa.end_state, nfa.start, "@"]);
-    Add(nfa.transition, [nfa.end_state, end_state, "@"]);
+    Add(nfa.transition, [start, nfa.start, '@']);
+    Add(nfa.transition, [start, end_state, '@']);
+    Add(nfa.transition, [nfa.end_state, nfa.start, '@']);
+    Add(nfa.transition, [nfa.end_state, end_state, '@']);
     
     Add(stack, rec(start:= start, end_state:= end_state, transition:= nfa.transition));
 end );
@@ -116,10 +116,10 @@ function(stack, stateCounter)
     end_state:= stateCounter+1;
     stateCounter:= stateCounter+1;
     
-    Add(nfa1.transition, [start, nfa1.start, "@"]);
-    Add(nfa1.transition, [start, nfa2.start, "@"]);
-    Add(nfa1.transition, [nfa1.end_state, end_state, "@"]);
-    Add(nfa1.transition, [nfa2.end_state, end_state, "@"]);
+    Add(nfa1.transition, [start, nfa1.start, '@']);
+    Add(nfa1.transition, [start, nfa2.start, '@']);
+    Add(nfa1.transition, [nfa1.end_state, end_state, '@']);
+    Add(nfa1.transition, [nfa2.end_state, end_state, '@']);
     for transition in nfa2.transition do
         Add(nfa1.transition, transition);
     od;
@@ -169,7 +169,7 @@ function(currentStates, transitions)
     while Length(stack) > 0 do
         current:= Remove(stack);
         for transition in transitions do
-            if (transition[1] = current) and (transition[3] = "@") and (not transition[2] in reachable_states) then
+            if (transition[1] = current) and (transition[3] = '@') and (not transition[2] in reachable_states) then
                 Add(reachable_states, transition[2]);
                 Add(stack, transition[2]);
             fi;
@@ -211,7 +211,6 @@ function(exp)
 
         elif char = '(' then
             Add(stack, char);
-            Print(stack);
         
         elif char = ')' then
 
@@ -225,7 +224,6 @@ function(exp)
             Remove(stack);
         
         elif is_operator(char) then
-            Print(stack);
             while (Length(stack) > 0) and (is_operator(stack[1])) do
                 Add(output, Remove(stack));
             od;
@@ -246,10 +244,43 @@ end );
 
 InstallGlobalFunction( is_operator,
 function(char)
-    if (char = '*') or (char = '.') or (char = '?') or (char = '|') then
+    if (char = '*') or (char = '.') or (char = '?') or (char = '|') or (char = '+') then
         return true;
     else return false;
     fi;
+end );
+
+InstallGlobalFunction( display_Automaton,
+function(exp)
+    local aut, alphabet, reformatedTransitions, tempTransition, char, transitions, transition, automaton, transitionTable, i;
+    
+    aut:= thompsons_nfa(convert_to_postfix(exp));
+    LoadPackage("automata");
+    transitions:= aut.transition;
+    alphabet:= [];
+    reformatedTransitions:= [];
+    transitionTable:= [];
+    tempTransition:= [];
+    for transition in transitions do
+        if not (transition[3] in alphabet) then
+            Add(alphabet, transition[3]);
+        fi;
+    od;
+    for char in alphabet do
+        for i in [1..aut.end_state] do
+            for transition in transitions do
+                if (transition[3] = char) and (transition[1] = i) then
+                    Add(tempTransition,transition[2]);
+                fi;
+            od;
+            Add(reformatedTransitions, tempTransition);
+            tempTransition:= [];
+        od;
+        Add(transitionTable, reformatedTransitions);
+        reformatedTransitions:= [];
+    od;
+    automaton:= Automaton("nondet", aut.end_state, alphabet, transitionTable, [aut.start], [aut.end_state]);
+    return automaton;
 end );
 
 InstallGlobalFunction( text_Match,
