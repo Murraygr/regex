@@ -224,7 +224,7 @@ function(exp)
             Remove(stack);
         
         elif is_operator(char) then
-            while (Length(stack) > 0) and (is_operator(stack[1])) do
+            while (Length(stack) > 0) and (is_operator(stack[Length(stack)])) do
                 Add(output, Remove(stack));
             od;
             Add(stack, char);
