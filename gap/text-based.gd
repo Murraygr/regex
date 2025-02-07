@@ -5,6 +5,7 @@ DeclareGlobalFunction( "concatenate_nfa" );
 DeclareGlobalFunction( "question_nfa" );
 DeclareGlobalFunction( "star_nfa" );
 DeclareGlobalFunction( "union_nfa" );
+DeclareGlobalFunction( "plus_nfa" );
 DeclareGlobalFunction( "create_state" );
 DeclareGlobalFunction( "simulate_nfa" );
 DeclareGlobalFunction( "epsilon_transitions" );

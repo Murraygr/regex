@@ -24,6 +24,9 @@ function(exp)
             stateCounter:= stateCounter+2;
         elif char = '.' then
             concatenate_nfa(stack);
+        elif char = '+' then
+            plus_nfa(stack, stateCounter);
+            stateCounter:= stateCounter+2;
         else
             literal_nfa(char, stack, stateCounter);
             stateCounter:=stateCounter+2;
@@ -125,6 +128,23 @@ function(stack, stateCounter)
     od;
     
     Add(stack, rec(start:= start, end_state:= end_state, transition:= nfa1.transition));
+end );
+
+InstallGlobalFunction( plus_nfa,
+function(stack, stateCounter)
+    local nfa, start, end_state, transition;
+    
+    nfa:= Remove(stack);
+    
+    start:= stateCounter+1;
+    stateCounter:= stateCounter+1;
+    end_state:= stateCounter+1;
+    stateCounter:= stateCounter+1;
+    
+    Add(nfa.transition, [start, nfa.start, '@']);
+    Add(nfa.transition, [nfa.end_state, end_state, '@']);
+    Add(nfa.transition, [nfa.end_state, nfa.start, '@']);
+    Add(stack, rec(start:= start, end_state:= end_state, transition:= nfa.transition));
 end );
 
 InstallGlobalFunction( create_state,
@@ -261,11 +281,13 @@ function(exp)
     reformatedTransitions:= [];
     transitionTable:= [];
     tempTransition:= [];
+
     for transition in transitions do
         if not (transition[3] in alphabet) then
             Add(alphabet, transition[3]);
         fi;
     od;
+
     for char in alphabet do
         for i in [1..aut.end_state] do
             for transition in transitions do
@@ -279,7 +301,9 @@ function(exp)
         Add(transitionTable, reformatedTransitions);
         reformatedTransitions:= [];
     od;
+
     automaton:= Automaton("nondet", aut.end_state, alphabet, transitionTable, [aut.start], [aut.end_state]);
+
     return automaton;
 end );
 
