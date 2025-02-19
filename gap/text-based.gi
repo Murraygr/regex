@@ -216,12 +216,56 @@ function(currentStates, symbol, transitions)
     return nextStates;
 end );
 
+InstallGlobalFunction( precedence,
+function(operator)
+    if operator = '*' or operator = '?' or operator = '+' then
+        return 4;
+    elif operator = '.' then
+        return 3;
+    elif operator = '|' then
+        return 2;
+    elif operator = '(' then
+        return 1;
+    else
+        return 0;
+    fi;
+end );
+
+InstallGlobalFunction( format_expression,
+function(exp)
+    local operators, binaryOperators, i, res, c1, c2;
+
+    operators:= ['|', '?', '*', '+', '^'];
+    binaryOperators:= ['^', '|'];
+    i:= 1;
+    res:= "";
+
+    while i < Length(exp) do
+        c1:= exp[i];
+        i:= i+1;
+        c2:= exp[i];
+
+        res:= Concatenation(res, [c1]);
+
+        if (c1 <> '(') and (c2 <> ')') and (not c2 in operators) and (not c1 in binaryOperators) then
+            res:= Concatenation(res, ".");
+        fi;
+    od;
+
+    res:= Concatenation(res, [exp[Length(exp)]]);
+
+    return res;
+
+end );
+
 InstallGlobalFunction( convert_to_postfix,
 function(exp)
     local output, stack, top, char, asciiChar, temp;
 
     output:= [];
     stack:= [];
+
+    exp:= format_expression(exp);
 
     for char in exp do
         asciiChar:= IntChar(char);
@@ -244,7 +288,7 @@ function(exp)
             Remove(stack);
         
         elif is_operator(char) then
-            while (Length(stack) > 0) and (is_operator(stack[Length(stack)])) do
+            while (Length(stack) > 0) and (precedence(stack[Length(stack)]) > precedence(char)) do
                 Add(output, Remove(stack));
             od;
             Add(stack, char);
@@ -274,8 +318,9 @@ InstallGlobalFunction( display_Automaton,
 function(exp)
     local aut, alphabet, reformatedTransitions, tempTransition, char, transitions, transition, automaton, transitionTable, i;
     
-    aut:= thompsons_nfa(convert_to_postfix(exp));
     LoadPackage("automata");
+
+    aut:= thompsons_nfa(convert_to_postfix(exp));
     transitions:= aut.transition;
     alphabet:= [];
     reformatedTransitions:= [];
