@@ -270,7 +270,7 @@ function(exp)
     for char in exp do
         asciiChar:= IntChar(char);
 
-        if (asciiChar in [97..122]) or (asciiChar in [65..90]) or (asciiChar in [48..57]) then
+        if (asciiChar in [97..122]) or (asciiChar in [65..90]) or (asciiChar in [48..57]) or (asciiChar = 32) then
             Add(output, char);
 
         elif char = '(' then
