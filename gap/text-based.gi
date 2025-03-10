@@ -1,4 +1,4 @@
-InstallGlobalFunction( thompsons_nfa,
+InstallGlobalFunction( THOMPSONS_NFA,
 function(exp)
     local stack, stateCounter, char, i;
 
@@ -9,30 +9,30 @@ function(exp)
 
     while i <= Length(exp) do
         if exp[i] = '\\' and i+1 <= Length(exp) then
-            literal_nfa(exp[i+1], stack, stateCounter);
+            LITERAL_NFA(exp[i+1], stack, stateCounter);
             stateCounter:=stateCounter+2;
             i:= i+1;
         elif exp[i] = '|' then
-            union_nfa(stack, stateCounter);
+            UNION_NFA(stack, stateCounter);
             stateCounter:= stateCounter+2;
         elif exp[i] = '-' then
-            set_nfa(stack, stateCounter);
+            SET_NFA(stack, stateCounter);
         elif exp[i] = '*' then
-            star_nfa(stack, stateCounter);
+            STAR_NFA(stack, stateCounter);
             stateCounter:= stateCounter+2;
         elif exp[i] = '?' then
-            question_nfa(stack, stateCounter);
+            QUESTION_NFA(stack, stateCounter);
             stateCounter:= stateCounter+2;
         elif exp[i] = '.' then
-            any_nfa(stack, stateCounter);
+            ANY_NFA(stack, stateCounter);
             stateCounter:= stateCounter+2;
         elif exp[i] = '`' then
-            concatenate_nfa(stack);
+            CONCATENATE_NFA(stack);
         elif exp[i] = '+' then
-            plus_nfa(stack, stateCounter);
+            PLUS_NFA(stack, stateCounter);
             stateCounter:= stateCounter+2;
         else
-            literal_nfa(exp[i], stack, stateCounter);
+            LITERAL_NFA(exp[i], stack, stateCounter);
             stateCounter:=stateCounter+2;
         fi;
         i:= i+1;
@@ -42,7 +42,7 @@ function(exp)
 
 end );
 
-InstallGlobalFunction( set_nfa,
+InstallGlobalFunction( SET_NFA,
 function(stack, stateCounter)
     local start, end_state, nfa1, nfa2, transitions, endOfSet, startOfSet, i;
 
@@ -64,7 +64,7 @@ function(stack, stateCounter)
     Add(stack, rec(start:=start, end_state:= end_state, transition:= transitions));
 end );
 
-InstallGlobalFunction( any_nfa,
+InstallGlobalFunction( ANY_NFA,
 function(stack, stateCounter)
     local start, end_state, transitions;
     
@@ -78,7 +78,7 @@ function(stack, stateCounter)
     Add(stack, rec(start:=start, end_state:= end_state, transition:= transitions));
 end );
 
-InstallGlobalFunction( literal_nfa,
+InstallGlobalFunction( LITERAL_NFA,
 function(char, stack, stateCounter)
     local start, end_state, transition;
 
@@ -91,7 +91,7 @@ function(char, stack, stateCounter)
     Add(stack, rec(start:=start, end_state:= end_state, transition:= transition));
 end );
 
-InstallGlobalFunction( concatenate_nfa,
+InstallGlobalFunction( CONCATENATE_NFA,
 function(stack)
     local nfa1, nfa2, start1, start2, end1, end2, transition;
 
@@ -111,7 +111,7 @@ function(stack)
     Add(stack, rec(start:= start1, end_state:= end2, transition:= nfa1.transition));
 end );
 
-InstallGlobalFunction( question_nfa,
+InstallGlobalFunction( QUESTION_NFA,
 function(stack, stateCounter)
     local nfa, start, end_state;
     
@@ -128,7 +128,7 @@ function(stack, stateCounter)
     Add(stack, rec(start:= start, end_state:= end_state, transition:= nfa.transition));
 end );
 
-InstallGlobalFunction( star_nfa,
+InstallGlobalFunction( STAR_NFA,
 function(stack, stateCounter)
     local nfa, start, end_state;
     
@@ -147,7 +147,7 @@ function(stack, stateCounter)
     Add(stack, rec(start:= start, end_state:= end_state, transition:= nfa.transition));
 end );
 
-InstallGlobalFunction( union_nfa,
+InstallGlobalFunction( UNION_NFA,
 function(stack, stateCounter)
     local nfa1, nfa2, start, end_state, transition;
     
@@ -170,7 +170,7 @@ function(stack, stateCounter)
     Add(stack, rec(start:= start, end_state:= end_state, transition:= nfa1.transition));
 end );
 
-InstallGlobalFunction( plus_nfa,
+InstallGlobalFunction( PLUS_NFA,
 function(stack, stateCounter)
     local nfa, start, end_state, transition;
     
@@ -187,25 +187,19 @@ function(stack, stateCounter)
     Add(stack, rec(start:= start, end_state:= end_state, transition:= nfa.transition));
 end );
 
-InstallGlobalFunction( create_state,
-function(stateCounter)
-    stateCounter:= stateCounter+1;
-    return stateCounter;
-end );
-
-InstallGlobalFunction( simulate_nfa,
+InstallGlobalFunction( SIMULATE_NFA,
 function(nfa, input)
     local startStates, transitions, currentStates, char, state;
 
     transitions:= nfa.transition;
 
-    currentStates:= epsilon_transitions([nfa.start], transitions);
+    currentStates:= EPSILON_TRANSITIONS([nfa.start], transitions);
 
     for char in input do
 
-        currentStates:= move_state(currentStates, char, transitions);
+        currentStates:= MOVE_STATE(currentStates, char, transitions);
 
-        currentStates:= epsilon_transitions(currentStates, transitions);
+        currentStates:= EPSILON_TRANSITIONS(currentStates, transitions);
     
     od;
 
@@ -219,7 +213,7 @@ function(nfa, input)
 
 end );
 
-InstallGlobalFunction( epsilon_transitions,
+InstallGlobalFunction( EPSILON_TRANSITIONS,
 function(currentStates, transitions)
     local reachable_states, stack, current, transition;
 
@@ -239,7 +233,7 @@ function(currentStates, transitions)
     return reachable_states;
 end );
 
-InstallGlobalFunction( move_state,
+InstallGlobalFunction( MOVE_STATE,
 function(currentStates, symbol, transitions)
     local nextStates, transition, state;
     
@@ -259,7 +253,7 @@ function(currentStates, symbol, transitions)
     return nextStates;
 end );
 
-InstallGlobalFunction( precedence,
+InstallGlobalFunction(PRECEDENCE,
 function(operator)
     if operator = '*' or operator = '?' or operator = '+' then
         return 4;
@@ -274,7 +268,7 @@ function(operator)
     fi;
 end );
 
-InstallGlobalFunction( format_expression,
+InstallGlobalFunction( FORMAT_EXPRESSION,
 function(exp)
     local operators, binaryOperators, i, res, c1, c2;
 
@@ -301,7 +295,7 @@ function(exp)
 
 end );
 
-InstallGlobalFunction( convert_to_postfix,
+InstallGlobalFunction( CONVERT_TO_POSTFIX,
 function(exp)
     local output, stack, top, char, asciiChar, temp, i;
 
@@ -309,7 +303,7 @@ function(exp)
     stack:= [];
     i:= 1;
 
-    exp:= format_expression(exp);
+    exp:= FORMAT_EXPRESSION(exp);
 
     while i <= Length(exp) do
         asciiChar:= IntChar(exp[i]);
@@ -338,8 +332,8 @@ function(exp)
             fi;
             Remove(stack);
         
-        elif is_operator(exp[i]) then
-            while (Length(stack) > 0) and (precedence(stack[Length(stack)]) > precedence(exp[i])) do
+        elif IS_OPERATOR(exp[i]) then
+            while (Length(stack) > 0) and (PRECEDENCE(stack[Length(stack)]) >PRECEDENCE(exp[i])) do
                 Add(output, Remove(stack));
             od;
             Add(stack, exp[i]);
@@ -358,7 +352,7 @@ function(exp)
     return output;
 end );
 
-InstallGlobalFunction( is_operator,
+InstallGlobalFunction( IS_OPERATOR,
 function(char)
     if (char = '*') or (char = '`') or (char = '?') or (char = '|') or (char = '+') or (char = '-') then
         return true;
@@ -372,7 +366,7 @@ function(exp)
     
     LoadPackage("automata");
 
-    aut:= thompsons_nfa(convert_to_postfix(exp));
+    aut:= THOMPSONS_NFA(CONVERT_TO_POSTFIX(exp));
     transitions:= aut.transition;
     alphabet:= [];
     reformatedTransitions:= [];
@@ -412,6 +406,6 @@ end );
 InstallGlobalFunction( text_Match,
 function(exp, input)
     
-    return simulate_nfa(thompsons_nfa(convert_to_postfix(exp)), input);
+    return SIMULATE_NFA(THOMPSONS_NFA(CONVERT_TO_POSTFIX(exp)), input);
 
 end );
