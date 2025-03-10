@@ -1,8 +1,3 @@
-InstallGlobalFunction( reg_Example,
-function()
-    Print(reg_Match("abc", "abc"));
-end );
-
 InstallGlobalFunction( thompsons_nfa,
 function(exp)
     local stack, stateCounter, char, i;
@@ -12,23 +7,32 @@ function(exp)
     i:= 1;
 
 
-    for char in exp do
-        if char = '|' then
+    while i <= Length(exp) do
+        if exp[i] = '\\' and i+1 <= Length(exp) then
+            literal_nfa(exp[i+1], stack, stateCounter);
+            stateCounter:=stateCounter+2;
+            i:= i+1;
+        elif exp[i] = '|' then
             union_nfa(stack, stateCounter);
             stateCounter:= stateCounter+2;
-        elif char = '*' then
+        elif exp[i] = '-' then
+            set_nfa(stack, stateCounter);
+        elif exp[i] = '*' then
             star_nfa(stack, stateCounter);
             stateCounter:= stateCounter+2;
-        elif char = '?' then
+        elif exp[i] = '?' then
             question_nfa(stack, stateCounter);
             stateCounter:= stateCounter+2;
-        elif char = '.' then
+        elif exp[i] = '.' then
+            any_nfa(stack, stateCounter);
+            stateCounter:= stateCounter+2;
+        elif exp[i] = '`' then
             concatenate_nfa(stack);
-        elif char = '+' then
+        elif exp[i] = '+' then
             plus_nfa(stack, stateCounter);
             stateCounter:= stateCounter+2;
         else
-            literal_nfa(char, stack, stateCounter);
+            literal_nfa(exp[i], stack, stateCounter);
             stateCounter:=stateCounter+2;
         fi;
         i:= i+1;
@@ -36,6 +40,42 @@ function(exp)
 
     return stack[1];
 
+end );
+
+InstallGlobalFunction( set_nfa,
+function(stack, stateCounter)
+    local start, end_state, nfa1, nfa2, transitions, endOfSet, startOfSet, i;
+
+    nfa1:= Remove(stack);
+    nfa2:= Remove(stack);
+    
+    start:= nfa1.start;
+    end_state:= nfa1.end_state;
+    
+    endOfSet:= IntChar(nfa1.transition[1][3]);
+    startOfSet:= IntChar(nfa2.transition[1][3]);
+
+    transitions:= [];
+
+    for i in [startOfSet..endOfSet] do
+        Add(transitions, [start, end_state, CharInt(i)]);
+    od;
+
+    Add(stack, rec(start:=start, end_state:= end_state, transition:= transitions));
+end );
+
+InstallGlobalFunction( any_nfa,
+function(stack, stateCounter)
+    local start, end_state, transitions;
+    
+    start:= stateCounter+1;
+    stateCounter:= stateCounter+1;
+    end_state:= stateCounter+1;
+    stateCounter:= stateCounter+1;
+    
+    transitions:= [[start, end_state, '~']];
+
+    Add(stack, rec(start:=start, end_state:= end_state, transition:= transitions));
 end );
 
 InstallGlobalFunction( literal_nfa,
@@ -209,6 +249,9 @@ function(currentStates, symbol, transitions)
         for transition in transitions do
             if (transition[1] = state) and (transition[3] = symbol) then
                 Add(nextStates, transition[2]);
+
+            elif (transition[1] = state) and (transition[3] = '~') then
+                Add(nextStates, transition[2]);
             fi;
         od;
     od;
@@ -220,11 +263,11 @@ InstallGlobalFunction( precedence,
 function(operator)
     if operator = '*' or operator = '?' or operator = '+' then
         return 4;
-    elif operator = '.' then
+    elif operator = '`' then
         return 3;
-    elif operator = '|' then
+    elif operator = '|' or operator = '-' then
         return 2;
-    elif operator = '(' then
+    elif operator = '(' or operator = '[' then
         return 1;
     else
         return 0;
@@ -235,8 +278,8 @@ InstallGlobalFunction( format_expression,
 function(exp)
     local operators, binaryOperators, i, res, c1, c2;
 
-    operators:= ['|', '?', '*', '+', '^'];
-    binaryOperators:= ['^', '|'];
+    operators:= ['|', '?', '*', '+', '^', '-'];
+    binaryOperators:= ['^', '|', '-'];
     i:= 1;
     res:= "";
 
@@ -247,8 +290,8 @@ function(exp)
 
         res:= Concatenation(res, [c1]);
 
-        if (c1 <> '(') and (c2 <> ')') and (not c2 in operators) and (not c1 in binaryOperators) then
-            res:= Concatenation(res, ".");
+        if not (((c1 <> '(') and (c2 <> ')')) <> ((c1 <> '[') and (c2 <> ']'))) and (not c2 in operators) and (not c1 in binaryOperators) then
+            res:= Concatenation(res, "`");
         fi;
     od;
 
@@ -260,39 +303,48 @@ end );
 
 InstallGlobalFunction( convert_to_postfix,
 function(exp)
-    local output, stack, top, char, asciiChar, temp;
+    local output, stack, top, char, asciiChar, temp, i;
 
     output:= [];
     stack:= [];
+    i:= 1;
 
     exp:= format_expression(exp);
 
-    for char in exp do
-        asciiChar:= IntChar(char);
+    while i <= Length(exp) do
+        asciiChar:= IntChar(exp[i]);
 
-        if (asciiChar in [97..122]) or (asciiChar in [65..90]) or (asciiChar in [48..57]) or (asciiChar = 32) then
-            Add(output, char);
+        if (asciiChar in [97..122]) or (asciiChar in [65..90]) or (asciiChar in [48..57]) or (asciiChar = 32) or (exp[i] = '.') then
+            Add(output, exp[i]);
 
-        elif char = '(' then
-            Add(stack, char);
+        elif exp[i] = '\\' then
+            Add(output, exp[i]);
+            if i+1 <= Length(exp) then
+                Add(output, exp[i+1]);
+                i:= i+1;
+            fi;
+
+        elif exp[i] = '(' or exp[i] = '[' then
+            Add(stack, exp[i]);
         
-        elif char = ')' then
+        elif exp[i] = ')' or exp[i] = ']' then
 
-            while (Length(stack) > 0) and (stack[Length(stack)] <> '(') do
+            while (Length(stack) > 0) and not ((stack[Length(stack)] <> '(') <> (stack[Length(stack)] <> '[')) do
                 Add(output, Remove(stack));
             od;
 
-            if (Length(stack) = 0) or (stack[Length(stack)] <> '(') then
+            if (Length(stack) = 0) or not ((stack[Length(stack)] <> '(') <> (stack[Length(stack)] <> '[')) then
                 Print("Invalid parentheses");
             fi;
             Remove(stack);
         
-        elif is_operator(char) then
-            while (Length(stack) > 0) and (precedence(stack[Length(stack)]) > precedence(char)) do
+        elif is_operator(exp[i]) then
+            while (Length(stack) > 0) and (precedence(stack[Length(stack)]) > precedence(exp[i])) do
                 Add(output, Remove(stack));
             od;
-            Add(stack, char);
+            Add(stack, exp[i]);
         fi;
+        i:= i+1;
     od;
 
     while Length(stack) > 0 do
@@ -308,7 +360,7 @@ end );
 
 InstallGlobalFunction( is_operator,
 function(char)
-    if (char = '*') or (char = '.') or (char = '?') or (char = '|') or (char = '+') then
+    if (char = '*') or (char = '`') or (char = '?') or (char = '|') or (char = '+') or (char = '-') then
         return true;
     else return false;
     fi;
@@ -350,6 +402,11 @@ function(exp)
     automaton:= Automaton("nondet", aut.end_state, alphabet, transitionTable, [aut.start], [aut.end_state]);
 
     return automaton;
+end );
+
+InstallGlobalFunction( text_findall,
+function(exp, input)
+    Print("todo");
 end );
 
 InstallGlobalFunction( text_Match,
