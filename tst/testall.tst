@@ -51,20 +51,20 @@ gap> text_Match("a", "a");
 true
 gap> text_Match("a", "hello abc");
 false
-gap> text_Match("e.l", "hello abc");
+gap> text_Match("el", "hello abc");
 false
-gap> text_Match("(H|h).e.l.l.o", "hello");
+gap> text_Match("(H|h)ello", "hello");
 true
-gap> text_Match("(H|h).e.l.l.o", "Hello");
+gap> text_Match("(H|h)ello", "Hello");
 true
-gap> text_Match("(H|h).e.l.l.o", "bello");
+gap> text_Match("(H|h)ello", "bello");
 false
-gap> text_Match("m.e.o*.w", "mew");
+gap> text_Match("meo*w", "mew");
 true
-gap> text_Match("m.e.o*.w", "meow");
+gap> text_Match("meo*w", "meow");
 true
-gap> text_Match("m.e.o*.w", "meoooooow");
+gap> text_Match("meo*w", "meoooooow");
 true
-gap> text_Match("a?.a?.a?.a?.a?.a?.a?.a?.a?.a?.a?.a?.a?.a?.a?.a?.a?.a?.a?.a?.a?.a?.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a.a", "aaaaaaaaaaaaaaaaaaaaaa");
+gap> text_Match("a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?aaaaaaaaaaaaaaaaaaaaaa", "aaaaaaaaaaaaaaaaaaaaaa");
 true
 gap> STOP_TEST( "testall.tst", 10000 );
