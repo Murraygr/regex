@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- This is an automatically generated file. -->
+<TitlePage>
+  <Title>
+    regex
+  </Title>
+  <Subtitle>
+    Implements regular expression matching.
+  </Subtitle>
+  <Version>
+    0.1
+  </Version>
+  <Author>
+    Murray Greig<Alt Only="LaTeX"><Br/></Alt>
+<Email>mjg31@st-andrews.ac.uk</Email>
+
+  </Author>
+  <Date>
+    27 September 2024
+  </Date>
+  </TitlePage>
