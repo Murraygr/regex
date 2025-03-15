@@ -1,3 +1,14 @@
+############################################################################
+##
+## text-based.gd
+##
+############################################################################
+##
+## This file contains functions for regular expression matching using an NFA
+## constructed by Thompson's construction algorithm
+##
+############################################################################
+
 InstallGlobalFunction( THOMPSONS_NFA,
 function(exp)
     local stack, stateCounter, char, i;
@@ -41,6 +52,7 @@ function(exp)
     return stack[1];
 
 end );
+
 
 InstallGlobalFunction( SET_NFA,
 function(stack, stateCounter)
