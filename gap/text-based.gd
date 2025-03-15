@@ -196,7 +196,7 @@ DeclareGlobalFunction( "IS_OPERATOR" );
 ##
 ############################################################################
 DeclareGlobalFunction( "PRECEDENCE" );
-DeclareGlobalFunction( "FORMAT_EXPRESSION" );
+
 ############################################################################
 ##
 ## FORMAT_EXPRESSION(exp)
@@ -206,6 +206,7 @@ DeclareGlobalFunction( "FORMAT_EXPRESSION" );
 ## function sees it.
 ##
 ############################################################################
+DeclareGlobalFunction( "FORMAT_EXPRESSION" );
 
 ############################################################################
 ##
