@@ -1,18 +1,11 @@
 #
 # regex: Implements regular expression matching.
 #
-#! @Chapter Introduction
-#!
-#! regex is a package which does some
-#! interesting and cool things
-#!
 #! @Chapter Functionality
-#!
-#!
-#! @Section Text based regex engine methods
+#! @Section Text based methods
 #!
 #! This section will describe the functions for regular expression matching
-#! using an NFA constructed by Thompson's construction algorithm
+#! using an NFA constructed by Thompson's construction algorithm.
 
 #! @Description 
 #!  Takes a regular expression, exp, in the form of a string and converts
