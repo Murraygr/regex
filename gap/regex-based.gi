@@ -2,39 +2,35 @@
 # regex: Implements regular expression matching.
 #
 # Implementations
-#
-InstallGlobalFunction( regex_Example,
-function()
-end );
 
-InstallGlobalFunction( reg_Is_Star,
+InstallGlobalFunction( REG_IS_STAR,
 function(char)
 	if char = '*' then return true;
 	else return false;
 	fi;
 end );
 
-InstallGlobalFunction( reg_Is_Question,
+InstallGlobalFunction( REG_IS_QUESTION,
 function(char)
 	if char = '?' then return true;
 	else return false;
 	fi;
 end );
 
-InstallGlobalFunction( reg_Is_Plus,
+InstallGlobalFunction( REG_IS_PLUS,
 function(char)
 	if char = '+' then return true;
 	else return false;
 	fi;
 end );
 
-InstallGlobalFunction( reg_Alternative_Match,
+InstallGlobalFunction( REG_ALTERNATIVE_MATCH,
 function(exp, target)
 	local options, found, i;
 	options:= SplitString(exp[1]{ [2..Length(exp[1])-1] }, "|");
 
 	for i in [1..Length(options)] do
-		found:= reg_Individual_Match(Concatenation(options[i],exp[3]), target);
+		found:= REG_INDIVIDUAL_MATCH(Concatenation(options[i],exp[3]), target);
 		if found then
 			return found;
 		fi;
@@ -43,7 +39,7 @@ function(exp, target)
 
 end );
 
-InstallGlobalFunction( reg_Special_Match,
+InstallGlobalFunction( REG_SPECIAL_MATCH,
 function(split_exp, target, min_match_num, max_match_num, infinite)
 	local match_len, found, temp, matched, temp2;
 	match_len:= 0;
@@ -55,7 +51,7 @@ function(split_exp, target, min_match_num, max_match_num, infinite)
 	fi;
 
 	while infinite or (match_len < max_match_num) do
-		found:= reg_Individual_Match(temp, target);
+		found:= REG_INDIVIDUAL_MATCH(temp, target);
 		if found then
 			temp:= Concatenation(temp, String(split_exp[1]));
 			match_len:= match_len+1;
@@ -65,7 +61,7 @@ function(split_exp, target, min_match_num, max_match_num, infinite)
 
 	while match_len >= min_match_num do 
 		temp2:= Concatenation(temp, split_exp[3]);
-		matched:= reg_Individual_Match(temp2, target);
+		matched:= REG_INDIVIDUAL_MATCH(temp2, target);
 		if matched then
 			return matched;
 		fi;
@@ -75,15 +71,15 @@ function(split_exp, target, min_match_num, max_match_num, infinite)
 	return false;
 end	);
 
-InstallGlobalFunction( reg_Is_Special,
+InstallGlobalFunction( REG_IS_SPECIAL,
 function(char)
-	if reg_Is_Star(char) or reg_Is_Question(char) or reg_Is_Plus(char) then
+	if REG_IS_STAR(char) or REG_IS_QUESTION(char) or REG_IS_PLUS(char) then
 		return true;
 	else return false;
 	fi;
 end );
 
-InstallGlobalFunction( reg_Split,
+InstallGlobalFunction( REG_SPLIT,
 function(exp)
 	local start, end_of_start, special, rest, temp;
 
@@ -103,7 +99,7 @@ function(exp)
 		start:= [exp[1]];
 	fi;
 
-	if end_of_start <= Length(exp) and reg_Is_Special(exp[end_of_start]) then
+	if end_of_start <= Length(exp) and REG_IS_SPECIAL(exp[end_of_start]) then
 		special:= exp[end_of_start];
 		end_of_start:= end_of_start+1;
 	fi;
@@ -114,7 +110,7 @@ function(exp)
 
 end	);
 
-InstallGlobalFunction( reg_Char_Match,
+InstallGlobalFunction( REG_CHAR_MATCH,
 function(exp, target)
 	if exp = "." then
 		return true;
@@ -122,8 +118,7 @@ function(exp, target)
 	return exp[1] = target[1];
 end );
 
-#Fix bug where "\\." matches any character
-InstallGlobalFunction( reg_Individual_Match,
+InstallGlobalFunction( REG_INDIVIDUAL_MATCH,
 function(exp, target)
 	local split_exp;
 
@@ -141,23 +136,23 @@ function(exp, target)
 		fi;
 	fi;
 	
-	split_exp:= reg_Split(exp);
+	split_exp:= REG_SPLIT(exp);
 
-	if reg_Is_Star(split_exp[2]) then
-		return reg_Special_Match(split_exp, target, 0, 0, true);
+	if REG_IS_STAR(split_exp[2]) then
+		return REG_SPECIAL_MATCH(split_exp, target, 0, 0, true);
 	
-	elif reg_Is_Question(split_exp[2]) then
-		return reg_Special_Match(split_exp, target, 0, 1, false);
+	elif REG_IS_QUESTION(split_exp[2]) then
+		return REG_SPECIAL_MATCH(split_exp, target, 0, 1, false);
 	
-	elif reg_Is_Plus(split_exp[2]) then
-		return reg_Special_Match(split_exp, target, 1, 0, true);
+	elif REG_IS_PLUS(split_exp[2]) then
+		return REG_SPECIAL_MATCH(split_exp, target, 1, 0, true);
 
 	elif (split_exp[1][1] = '(') and (split_exp[1][Length(split_exp[1])] = ')') then
-		return reg_Alternative_Match(split_exp, target);
+		return REG_ALTERNATIVE_MATCH(split_exp, target);
 	fi;
 
-	if reg_Char_Match(split_exp[1], target) then
-		return reg_Individual_Match(split_exp[3], target{ [2..Length(target)] });
+	if REG_CHAR_MATCH(split_exp[1], target) then
+		return REG_INDIVIDUAL_MATCH(split_exp[3], target{ [2..Length(target)] });
 
 	else return false;
 	fi;
@@ -179,7 +174,7 @@ function(exp, target)
 	fi;
 
 	while (position <= max_pos) do
-		if found <> reg_Individual_Match(exp, target{ [position..Length(target)] }) then
+		if found <> REG_INDIVIDUAL_MATCH(exp, target{ [position..Length(target)] }) then
 			#Print(position + '\n');
 			return [true, position];
 		fi;
