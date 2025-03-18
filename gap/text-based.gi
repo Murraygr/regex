@@ -412,7 +412,31 @@ end );
 
 InstallGlobalFunction( text_findall,
 function(exp, input)
-    Print("todo");
+    local i, matches, j, found, matchFound;
+
+    i:= 1;
+
+    matches:= [];
+
+    while i < Length(input) do
+        found:= false;
+
+        for j in [i..Length(input)] do
+            if text_Match(exp, input{[i..j]}) then
+                found:= true;
+                matchFound:= input{[i..j]};
+            fi;
+        od;
+        if found then
+            Add(matches, matchFound);
+            i:= i+Length(matchFound);
+        else
+            i:= i+1;
+        fi;
+    od;
+
+    return matches;
+        
 end );
 
 InstallGlobalFunction( text_Match,
