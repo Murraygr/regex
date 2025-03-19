@@ -410,7 +410,7 @@ function(exp)
     return automaton;
 end );
 
-InstallGlobalFunction( text_findall,
+InstallGlobalFunction( text_Findall,
 function(exp, input)
     local i, matches, j, found, matchFound;
 
@@ -437,6 +437,37 @@ function(exp, input)
 
     return matches;
         
+end );
+
+InstallGlobalFunction( text_Sub,
+function(exp, input, sub)
+    local matches, match, result, lastPos, i;
+
+    matches:= text_Findall(exp, input);
+    result:= "";
+    lastPos:= 1;
+    
+    for match in matches do
+
+        if lastPos = 1 then
+            i:= PositionSublist(input, match);
+        else
+            i:= PositionSublist(input, match, lastPos);
+        fi;
+
+        if i <> fail then
+            result:= Concatenation(result, input{[lastPos..i-1]});
+
+            result:= Concatenation(result, sub);
+
+            lastPos:= i+Length(match);
+        fi;
+    od;
+
+    result:= Concatenation(result, input{[lastPos..Length(input)]});
+    
+    return result;
+
 end );
 
 InstallGlobalFunction( text_Match,
