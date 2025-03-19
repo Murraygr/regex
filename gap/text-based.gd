@@ -138,8 +138,20 @@ DeclareGlobalFunction( "FORMAT_EXPRESSION" );
 DeclareGlobalFunction( "display_Automaton" );
 
 #! @Description
-#!  todo
-DeclareGlobalFunction( "text_findall" );
+#!  This function takes a regular expression and an input as a string.
+#!  This function then finds all matches of the regular expression in the
+#!  input string. Each match is returned in an ordered list according to
+#!  where the match appears.
+DeclareGlobalFunction( "text_Findall" );
+
+#! @Description
+#!  This function takes a regular expression, an input and the desired 
+#!  substitution as strings. The function then uses text_Findall to find
+#!  all applicable matches and each match is replaced with the desired
+#!  substitution. The returned as a string.<P/> For example, 
+#!  text_Sub("hello*", "hello and hell and helloooooo", "goodbye");,
+#!  will return the string "goodbye and goodbye and goodbye".
+DeclareGlobalFunction( "text_Sub" );
 
 #! @Description
 #!  This function takes a regular expression, exp, and an input as strings.
