@@ -340,7 +340,7 @@ function(exp)
             od;
 
             if (Length(stack) = 0) or not ((stack[Length(stack)] <> '(') <> (stack[Length(stack)] <> '[')) then
-                Print("Invalid parentheses");
+                Error("Invalid parentheses");
             fi;
             Remove(stack);
         
@@ -349,14 +349,17 @@ function(exp)
                 Add(output, Remove(stack));
             od;
             Add(stack, exp[i]);
+
+        else
+            Add(output, exp[i]);
         fi;
         i:= i+1;
     od;
 
     while Length(stack) > 0 do
         top:= Remove(stack);
-        if top = '(' or top = ')' then
-            Print("Invalid parentheses 2");
+        if top = '(' or top = ')' or top = '[' or top = ']' then
+            Error("Invalid parentheses");
         fi;
         Add(output, top);
     od;
@@ -466,6 +469,35 @@ function(exp, input, sub)
 
     result:= Concatenation(result, input{[lastPos..Length(input)]});
     
+    return result;
+
+end );
+
+InstallGlobalFunction( text_Split,
+function(exp, input)
+    local matches, result, lastPos, i, match;
+    
+    matches:= text_Findall(exp, input);
+    result:= [];
+    lastPos:= 1;
+    
+    for match in matches do
+
+        if lastPos = 1 then
+            i:= PositionSublist(input, match);
+        else
+            i:= PositionSublist(input, match, lastPos);
+        fi;
+        
+        if i <> fail then
+            Add(result, input{[lastPos..i-1]});
+
+            lastPos:= i+Length(match);
+        fi;
+    od;
+
+    Add(result, input{[lastPos..Length(input)]});
+
     return result;
 
 end );
