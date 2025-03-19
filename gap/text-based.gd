@@ -154,6 +154,14 @@ DeclareGlobalFunction( "text_Findall" );
 DeclareGlobalFunction( "text_Sub" );
 
 #! @Description
+#!  This function takes a regular expression and an input as a string.
+#!  The input string is then split by each match of the regular expression.
+#!  The split substrings are returned as a list. <P/> For example,
+#!  text_Split("[A-Z][0-9]", "Grades:A8MathsB7ComputerScienceD5Physics");, will
+#!  return the list ["Grades:", "Maths", "ComputerScience", "Physics"].
+DeclareGlobalFunction( "text_Split" );
+
+#! @Description
 #!  This function takes a regular expression, exp, and an input as strings.
 #!  The function then calls the relavent functions to convert the expression
 #!  to the appropriate format; create a corresponding NFA and simulates the
