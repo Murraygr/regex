@@ -11,7 +11,7 @@
 
 InstallGlobalFunction( THOMPSONS_NFA,
 function(exp)
-    local stack, stateCounter, char, i;
+    local stack, stateCounter, i;
 
     stack:= [];
     stateCounter:= 0;
@@ -19,7 +19,11 @@ function(exp)
 
 
     while i <= Length(exp) do
-        if exp[i] = '\\' and i+1 <= Length(exp) then
+        if exp[i] = '\\' and i+2 <= Length(exp) then
+            LITERAL_NFA(exp[i+2], stack, stateCounter);
+            stateCounter:= stateCounter+2;
+            i:= i+2;
+        elif exp[i] = '\\' and i+1 <= Length(exp) then
             LITERAL_NFA(exp[i+1], stack, stateCounter);
             stateCounter:=stateCounter+2;
             i:= i+1;
@@ -115,7 +119,7 @@ function(stack)
     start2:= nfa2.start;
     end2:= nfa2.end_state;
     
-    Add(nfa1.transition, [end1, start2, '@']);
+    Add(nfa1.transition, [end1, start2, '$']);
     for transition in nfa2.transition do
         Add(nfa1.transition, transition);
     od;
@@ -133,9 +137,9 @@ function(stack, stateCounter)
     end_state:= stateCounter+1;
     stateCounter:= stateCounter+1;
     
-    Add(nfa.transition, [start, nfa.start, '@']);
-    Add(nfa.transition, [start, end_state, '@']);
-    Add(nfa.transition, [nfa.end_state, end_state, '@']);
+    Add(nfa.transition, [start, nfa.start, '$']);
+    Add(nfa.transition, [start, end_state, '$']);
+    Add(nfa.transition, [nfa.end_state, end_state, '$']);
     
     Add(stack, rec(start:= start, end_state:= end_state, transition:= nfa.transition));
 end );
@@ -151,10 +155,10 @@ function(stack, stateCounter)
     end_state:= stateCounter+1;
     stateCounter:= stateCounter+1;
     
-    Add(nfa.transition, [start, nfa.start, '@']);
-    Add(nfa.transition, [start, end_state, '@']);
-    Add(nfa.transition, [nfa.end_state, nfa.start, '@']);
-    Add(nfa.transition, [nfa.end_state, end_state, '@']);
+    Add(nfa.transition, [start, nfa.start, '$']);
+    Add(nfa.transition, [start, end_state, '$']);
+    Add(nfa.transition, [nfa.end_state, nfa.start, '$']);
+    Add(nfa.transition, [nfa.end_state, end_state, '$']);
     
     Add(stack, rec(start:= start, end_state:= end_state, transition:= nfa.transition));
 end );
@@ -171,10 +175,10 @@ function(stack, stateCounter)
     end_state:= stateCounter+1;
     stateCounter:= stateCounter+1;
     
-    Add(nfa1.transition, [start, nfa1.start, '@']);
-    Add(nfa1.transition, [start, nfa2.start, '@']);
-    Add(nfa1.transition, [nfa1.end_state, end_state, '@']);
-    Add(nfa1.transition, [nfa2.end_state, end_state, '@']);
+    Add(nfa1.transition, [start, nfa1.start, '$']);
+    Add(nfa1.transition, [start, nfa2.start, '$']);
+    Add(nfa1.transition, [nfa1.end_state, end_state, '$']);
+    Add(nfa1.transition, [nfa2.end_state, end_state, '$']);
     for transition in nfa2.transition do
         Add(nfa1.transition, transition);
     od;
@@ -193,9 +197,9 @@ function(stack, stateCounter)
     end_state:= stateCounter+1;
     stateCounter:= stateCounter+1;
     
-    Add(nfa.transition, [start, nfa.start, '@']);
-    Add(nfa.transition, [nfa.end_state, end_state, '@']);
-    Add(nfa.transition, [nfa.end_state, nfa.start, '@']);
+    Add(nfa.transition, [start, nfa.start, '$']);
+    Add(nfa.transition, [nfa.end_state, end_state, '$']);
+    Add(nfa.transition, [nfa.end_state, nfa.start, '$']);
     Add(stack, rec(start:= start, end_state:= end_state, transition:= nfa.transition));
 end );
 
@@ -235,7 +239,7 @@ function(currentStates, transitions)
     while Length(stack) > 0 do
         current:= Remove(stack);
         for transition in transitions do
-            if (transition[1] = current) and (transition[3] = '@') and (not transition[2] in reachable_states) then
+            if (transition[1] = current) and (transition[3] = '$') and (not transition[2] in reachable_states) then
                 Add(reachable_states, transition[2]);
                 Add(stack, transition[2]);
             fi;
