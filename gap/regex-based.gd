@@ -16,6 +16,7 @@
 #! * '?' Matches 0 or 1 of the preceding regular expression
 #! * '[A-Z]' Matches a range of characters between the ASCII values for A and Z
 #! * '\\' Escapes the following character so it is treated as a literal
+#! * '\$' Represents the empty word for transitions
 #! Only for the regular expression based engine:
 #! * '^' Only matches if the regular expression matches at the start of the input string
 #! * '\$' Only matches if the regular expression matches at the end of the input string
@@ -36,7 +37,7 @@
 #! expression '(a|aa)*b' against the input 'a'^n will match in exponential time with respect
 #! to n for the reg_Match() function but polynomial time for the text_Match() function.
 #! <P/>
-#! Note neither of the two implementations are optimised for speed and are written with
+#! Note: neither of the two implementations are optimised for speed and are written with
 #! clarity in mind.
 #!
 #! @Section Regular expression based methods
