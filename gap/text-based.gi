@@ -19,7 +19,8 @@ function(exp)
 
 
     while i <= Length(exp) do
-        if exp[i] = '\\' and i+2 <= Length(exp) then
+        #Special case for these three characters as they have unique functions
+        if exp[i] = '\\' and i+2 <= Length(exp) and (exp[i+2] = '.' or exp[i+2] = '`' or exp[i+2] = '$')then
             LITERAL_NFA(exp[i+2], stack, stateCounter);
             stateCounter:= stateCounter+2;
             i:= i+2;
