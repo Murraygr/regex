@@ -65,8 +65,8 @@ PackageDoc := rec(
 
 Dependencies := rec(
   GAP := ">= 4.11",
-  NeededOtherPackages := [ ],
-  SuggestedOtherPackages := [ ["automata", ">= 1.16"] ],
+  NeededOtherPackages := [ ["automata", ">= 1.15"] ],
+  SuggestedOtherPackages := [ ],
   ExternalConditions := [ ],
 ),
 
