@@ -1,17 +1,12 @@
 # The GAP package regex
 
-TODO: add a description of your package; perhaps also instructions how how to
-install and use it, resp. where to find out more
+Regex is a package that implements the matching of regular expressions. To utilise download the entire regex directory into the pkg directory into your copy of GAP. Then use the command:
+
+LoadPackage("regex");
+
+To load the package into the GAP environment. True should be returned and you will be able to use the functions declared in the package.
 
 
 ## Contact
 
-TODO: add info on how to contact you and/or how to report issues with your
-package
-
-## License
-
-TODO: Provide information on the license of your package. A license is
-important as it determines who has a right to distribute your package. The
-"default" license to consider is GNU General Public License v2 or later, as
-that is the license of GAP itself.
+mjg31@st-andrews.ac.uk
